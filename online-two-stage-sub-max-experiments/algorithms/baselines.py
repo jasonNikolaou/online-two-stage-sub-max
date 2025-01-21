@@ -86,7 +86,7 @@ class Balkanski:
         return sum(x) <= self.l
 
     def round(self):
-        self.x = self.x * (1 - 1/np.sqrt(self.k)) # find the correct constant
+        self.x = self.x * (1 - 1/np.sqrt(self.k))
         
         x_int = []
         for p in self.x:
@@ -97,7 +97,7 @@ class Balkanski:
 
         if self.isValid(x_int):
             return x_int, sum([f.eval(x_int) for f in self.fs])
-        return np.zeros_like(self.x)
+        return np.zeros_like(self.x), 0
 
 class ReplacementGreedy:
     def __init__(self, fs, l, k, n):

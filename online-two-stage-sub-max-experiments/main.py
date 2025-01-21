@@ -8,7 +8,8 @@ import random
 random.seed(42)
 
 settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 5, 'k': 2}]
-algorithms = {'FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT'}
+settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5}]
+algorithms = ['FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT']
 
 for setting in settings:
     dataset = setting['dataset']
@@ -100,7 +101,7 @@ for setting in settings:
             balkanskiVal = 0
             iterations = 100
             print(f"Running Balkanski's algorithm {iterations} times.")
-            for t in range(T):
+            for t in range(iterations):
                 balkanski = Balkanski(fracSol, l, k, fs)
                 sol, val = balkanski.round()
                 balkanskiVal += val
@@ -117,10 +118,10 @@ for setting in settings:
         results[f'repGreedy_val'] = repGreedyVal
         results['repGreedy_sol'] = repGreedySol
 
-    with open('./results/wikipedia.pkl', 'wb') as file:
+    with open(f'./results/{dataset}.pkl', 'wb') as file:
         pickle.dump(results, file) 
 
-
+    
 
     
 
