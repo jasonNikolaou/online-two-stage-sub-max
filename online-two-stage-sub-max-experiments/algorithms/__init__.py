@@ -7,3 +7,4 @@ from .roundings import Pipage
 from .baselines import OptimalInHindsight
 from .baselines import Balkanski
 from .baselines import ReplacementGreedy
+from .baselines import Random

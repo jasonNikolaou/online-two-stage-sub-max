@@ -1,15 +1,15 @@
 import numpy as np
 import pickle
-from algorithms import GradientAscent, FTRL, Pipage, OptimalInHindsight, Balkanski, ReplacementGreedy
+from algorithms import GradientAscent, FTRL, Pipage, OptimalInHindsight, Balkanski, ReplacementGreedy, Random
 from online_learning import OnlineLearning
 from WTP import Potential, WTP
 import random
 
 random.seed(42)
 
-settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 5, 'k': 2}]
-settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5}]
-algorithms = ['FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT']
+settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.5}]
+# settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1}]
+algorithms = ['FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT', 'Random']
 
 for setting in settings:
     dataset = setting['dataset']
@@ -24,7 +24,7 @@ for setting in settings:
     n = len(wtps[0].potentials[0].w)
     l = setting['l']
     k = setting['k']
-    eta = 0.1
+    eta = setting['eta']
 
     # Initial solution
     x0 = np.zeros(n, dtype=int)
@@ -79,6 +79,18 @@ for setting in settings:
         results['frac_sol_FTRL_entropy'] = OL.xs[-1]
         results['int_sol_FTRL_entropy'] = OL.xs_int[-1]
 
+    if 'Random' in algorithms:
+        iterations = 100
+        rewards = np.zeros(len(fs))
+        for _ in range(iterations):
+            randomAlg = Random(fs, n, l, k)
+            rewards += np.array(randomAlg)
+        
+        rewards /= iterations
+        results['random'] = randomAlg.solve()
+
+
+    # === Offline algorithms ===
     if 'OPT' in algorithms:
         print(f'Calculating optimal solution in hindsight')
         FracOpt = OptimalInHindsight(fs, l, k, 'fractional')
