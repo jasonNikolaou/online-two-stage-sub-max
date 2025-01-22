@@ -4,7 +4,11 @@ import pickle
 
 settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'},
             {'dataset': 'images', 'title': 'Image summarization'}]
-settings = [{'dataset': 'images', 'title': 'Image summarization'}]
+# settings = [{'dataset': 'images', 'title': 'Image summarization'}]
+# settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
+
+cmap = plt.get_cmap("viridis")  # colorblind palette
+marker_styles = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']  # Unique markers for each line
 
 for setting in settings:
     dataset = setting['dataset']
@@ -22,6 +26,8 @@ for setting in settings:
 
     frac_rewards_one_stage_GA = data['one_stage_frac_rewards_GA']
     int_rewards_one_stage_GA = data['one_stage_int_rewards_GA']
+
+    rewards_random = data['random']
 
     frac_opt = data['frac_opt']
     int_opt = data['int_opt']
@@ -41,33 +47,74 @@ for setting in settings:
     cum_frac_one_stage_GA = np.cumsum(frac_rewards_one_stage_GA)
     cum_int_one_stage_GA = np.cumsum(int_rewards_one_stage_GA)
 
+    cum_random = np.cumsum(rewards_random)
+
     T = len(cum_frac_GA)
+    timesteps = np.arange(1, T+1)
     # Compute the average cumulative rewards at each time step
-    avg_cum_frac_GA = cum_frac_GA / (np.arange(1, T + 1))
-    avg_cum_int_GA = cum_int_GA / (np.arange(1, T + 1))
+    avg_cum_frac_GA = cum_frac_GA / timesteps
+    avg_cum_int_GA = cum_int_GA / timesteps
 
-    avg_cum_frac_FTRL_l2 = cum_frac_FTRL_l2/ (np.arange(1, T + 1))
-    avg_cum_int_FTRL_l2 = cum_int_FTRL_l2 / (np.arange(1, T + 1))
-    avg_cum_frac_FTRL_entropy = cum_frac_FTRL_entropy/ (np.arange(1, T + 1))
-    avg_cum_int_FTRL_entropy = cum_int_FTRL_entropy / (np.arange(1, T + 1))
+    avg_cum_frac_FTRL_l2 = cum_frac_FTRL_l2/ timesteps
+    avg_cum_int_FTRL_l2 = cum_int_FTRL_l2 / timesteps
+    avg_cum_frac_FTRL_entropy = cum_frac_FTRL_entropy/ timesteps
+    avg_cum_int_FTRL_entropy = cum_int_FTRL_entropy / timesteps
 
-    avg_cum_frac_one_stage_GA = cum_frac_one_stage_GA/ (np.arange(1, T + 1))
-    avg_cum_int_one_stage_GA = cum_int_one_stage_GA/ (np.arange(1, T + 1))
+    avg_cum_frac_one_stage_GA = cum_frac_one_stage_GA/ timesteps
+    avg_cum_int_one_stage_GA = cum_int_one_stage_GA/ timesteps
+
+    avg_cum_random = cum_random / timesteps
 
     # Plot the rewards
-    # plt.plot(avg_cum_frac_GA, label='frac GA')
-    plt.plot(avg_cum_int_GA, label='GA')
-    # plt.plot(avg_cum_frac_one_stage_GA, label='frac one-stage GA')
-    plt.plot(avg_cum_int_one_stage_GA, label='one-stage GA')
-    # plt.plot(avg_cum_frac_FTRL, label='frac FTRL')
-    plt.plot(avg_cum_int_FTRL_l2, label='FTRL - L_2')
-    plt.plot(avg_cum_int_FTRL_entropy, label='FTRL - entropy')
-    # plt.plot([frac_opt / T] * T, linestyle=':', linewidth=1.5, label='frac opt')
-    plt.plot([int_opt / T] * T, linestyle='--', linewidth=1.5, label='OPT')
-    plt.plot([balkanskiVal / T] * T, linestyle='-.', linewidth=1.5, label='CONTINUOUS-OPT')
-    plt.plot([repGreedyVal / T] * T, linestyle='-.', linewidth=1.5, label='REP-GREEDY')
+    # plt.plot(avg_cum_int_GA, label='GA')
+    # plt.plot(avg_cum_int_one_stage_GA, label='one-stage GA')
+    # plt.plot(avg_cum_int_FTRL_l2, label='FTRL - L2')
+    # plt.plot(avg_cum_int_FTRL_entropy, label='FTRL - entropy')
+    # plt.plot([int_opt / T] * T, linestyle='--', linewidth=1.5, label='OPT')
+    # plt.plot([balkanskiVal / T] * T, linestyle='-.', linewidth=1.5, label='CONTINUOUS-OPT')
+    # plt.plot([repGreedyVal / T] * T, linestyle='-.', linewidth=1.5, label='REP-GREEDY')
 
-    plt.title(title)
+
+    # Prepare data and labels
+    lines = [
+        (avg_cum_int_GA, 'RAOCO-GA'),
+        (avg_cum_int_FTRL_l2, 'RAOCO-FTRL-L2'),
+        (avg_cum_int_FTRL_entropy, 'RAOCO-FTRL-H'),
+        (avg_cum_int_one_stage_GA, '1S-GA'),
+        (avg_cum_random, 'Random')
+    ]
+    fixed_lines = [
+        ([int_opt / T] * T, '--', 'OPT'),
+        ([balkanskiVal / T] * T, '-.', 'CNT-OPT'),
+        ([repGreedyVal / T] * T, '-.', 'REP-GRD'),
+    ]
+
+    num_lines = len(lines) + len(fixed_lines)
+    colors = [cmap(i / (num_lines - 1)) for i in range(num_lines)]
+
+    # Plot lines with markers
+    for i, (data, label) in enumerate(lines):
+        plt.plot(
+            data,
+            label=label,
+            color=colors[i],
+            marker=marker_styles[i],
+            markevery=10,  # Place markers every 10 points
+        )
+
+    # Plot fixed lines (optional)
+    for i, (data, style, label) in enumerate(fixed_lines):
+        plt.plot(
+            data,
+            linestyle=style,
+            linewidth=1.5,
+            label=label,
+            color=colors[len(lines) + i],
+            marker=marker_styles[len(lines) + i],
+            markevery=10,  
+        )
+
+    # plt.title(title)
     plt.xlabel("Time Steps")
     plt.ylabel("Rewards")
     plt.legend()
