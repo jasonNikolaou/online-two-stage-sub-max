@@ -159,6 +159,57 @@ class ReplacementGreedy:
         val = sum([f.eval(self.x) for f in self.fs])
         return self.x, val
 
+# helper function
+def eval(wtp, x, k):
+    m = len(wtp.potentials)  # Number of potentials
+    n = len(x) # dimensions
+
+    # Create a Gurobi model
+    model = Model("WTP_Optimization_with_y_constraint")
+    model.setParam("OutputFlag", 0)  # Suppress Gurobi output
+
+    # Decision variables (binary)
+    
+    y = model.addVars(n, vtype=GRB.BINARY, name="y")
+    
+    # Auxiliary variables for potential evaluations
+    z = model.addVars(m, lb=0, name="z")
+    
+    # Objective: Maximize the WTP function
+    model.setObjective(
+        sum(wtp.weights[i] * z[i] for i in range(m)), GRB.MAXIMIZE
+    )
+    
+    # Constraints for each potential
+    for i, potential in enumerate(wtp.potentials):
+        # z_i <= b
+        model.addConstr(z[i] <= potential.b, name=f"z_{i}_upper")
+        # z_i <= w \cdot x
+        model.addConstr(
+            z[i] <= sum(potential.w[j] * y[j] for j in range(n)),
+            name=f"z_{i}_dot"
+        )
+    
+    # Cardinality constraint: sum(x) = k
+    model.addConstr(sum(y[i] for i in range(n)) == k, name="cardinality")
+    
+    # Element-wise constraint: y[i] <= x[i]
+    upper_bound_constraints = []
+    for i in range(n):
+        constr = model.addConstr(y[i] <= x[i], name=f"y_{i}_leq_x_{i}")
+        upper_bound_constraints.append(constr)
+    
+    # Optimize the model
+    model.optimize()
+    
+    # Extract the solution
+    if model.status == GRB.OPTIMAL:
+        # x_vals = np.array([x[i].x for i in range(n)])
+        obj_val = model.objVal
+        return obj_val
+    else:
+        raise ValueError("Optimization failed. Status: " + str(model.status))
+
 class Random:
     def __init__(self, fs, n, l, k):
         self.fs = fs
@@ -168,61 +219,13 @@ class Random:
         self.T = len(self.fs)
         self.rewards = []
 
-    # === Helper function ====
-    def eval(self, wtp, x, k):
-        m = len(wtp.potentials)  # Number of potentials
-
-        # Create a Gurobi model
-        model = Model("WTP_Optimization_with_y_constraint")
-        model.setParam("OutputFlag", 0)  # Suppress Gurobi output
-
-        # Decision variables (binary)
-        y = model.addVars(self.n, vtype=GRB.BINARY, name="y")
-        
-        # Auxiliary variables for potential evaluations
-        z = model.addVars(self.n, lb=0, name="z")
-        
-        # Objective: Maximize the WTP function
-        model.setObjective(
-            sum(wtp.weights[i] * z[i] for i in range(m)), GRB.MAXIMIZE
-        )
-    
-        # Constraints for each potential
-        for i, potential in enumerate(wtp.potentials):
-            # z_i <= b
-            model.addConstr(z[i] <= potential.b, name=f"z_{i}_upper")
-            # z_i <= w \cdot x
-            model.addConstr(
-                z[i] <= sum(potential.w[j] * y[j] for j in range(self.n)),
-                name=f"z_{i}_dot"
-            )
-        
-        # Cardinality constraint: sum(x) = k
-        model.addConstr(sum(y[i] for i in range(self.n)) == k, name="cardinality")
-    
-        # Element-wise constraint: y[i] <= x[i]
-        upper_bound_constraints = []
-        for i in range(self.n):
-            constr = model.addConstr(y[i] <= x[i], name=f"y_{i}_leq_x_{i}")
-            upper_bound_constraints.append(constr)
-        
-        # Optimize the model
-        model.optimize()
-        
-        # Extract the solution
-        if model.status == GRB.OPTIMAL:
-            # x_vals = np.array([x[i].x for i in range(n)])
-            obj_val = model.objVal
-            return obj_val
-        else:
-            raise ValueError("Optimization failed. Status: " + str(model.status))
-
     def solve(self):
+        self.rewards = []
         for t in range(self.T):
             indices = np.random.choice(self.n, self.l, replace=False)
             x_t = np.zeros(self.n)
             x_t[indices] = 1
-            self.rewards.append(self.eval(self.fs[t], x_t, self.k))
+            self.rewards.append(eval(self.fs[t], x_t, self.k))
         
         return self.rewards
         
