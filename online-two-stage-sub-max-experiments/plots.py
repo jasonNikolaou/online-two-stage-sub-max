@@ -3,9 +3,12 @@ import matplotlib.pyplot as plt
 import pickle
 
 settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'},
-            {'dataset': 'images', 'title': 'Image summarization'}]
+            {'dataset': 'images', 'title': 'Image summarization'},
+            {'dataset': 'teamformation', 'title': 'Team formation'}]
+
 # settings = [{'dataset': 'images', 'title': 'Image summarization'}]
 # settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
+settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
 
 cmap = plt.get_cmap("viridis")  # colorblind palette
 marker_styles = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']  # Unique markers for each line

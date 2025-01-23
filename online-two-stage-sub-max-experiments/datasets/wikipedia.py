@@ -708,7 +708,6 @@ if __name__ == '__main__':
         WTPs.append(wtp)
 
     file = './instances/wikipedia.pkl'
-    print(f'cwd = {os.getcwd()}')
     with open(file, 'wb') as file:
         pickle.dump(WTPs, file)
     print(f"List saved to {file}")
