@@ -6,17 +6,23 @@ from WTP import Potential, WTP
 import random
 
 random.seed(42)
+np.random.seed(42)
 
-settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
-# settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
-settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.01, 'sample': False}]
+# settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 1, 'sample': True}]
+settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
+# settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.01, 'sample': False}]
+# settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.1, 'sample': False}, 
+#             {'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True},
+#             {'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
 algorithms = ['FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT', 'Random']
+
 
 for setting in settings:
     dataset = setting['dataset']
     print(f'=== Running experiments for dataset = {dataset} ===')
 
     with open(f'./instances/{dataset}.pkl', 'rb') as file:
+        print(f'dataset = {dataset}')
         wtps = pickle.load(file)
 
     # Input
@@ -86,7 +92,8 @@ for setting in settings:
         results['int_sol_FTRL_entropy'] = OL.xs_int[-1]
 
     if 'Random' in algorithms:
-        iterations = 10
+        iterations = 1
+        print(f'Running random for {iterations} iterations')
         rewards = np.zeros(len(fs))
         for t in range(iterations):
             randomAlg = Random(fs, n, l, k)
@@ -118,7 +125,7 @@ for setting in settings:
             print(f'Before running balkasnki algorithm, run OPT.')
         else:
             balkanskiVal = 0
-            iterations = 100
+            iterations = 2
             print(f"Running Balkanski's algorithm {iterations} times.")
             for t in range(iterations):
                 balkanski = Balkanski(fracSol, l, k, fs)
