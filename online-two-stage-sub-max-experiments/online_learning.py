@@ -2,7 +2,7 @@ from WTP.WTP import WTP, Potential
 from algorithms.algorithms import GradientAscent
 from algorithms.roundings import Pipage
 import numpy as np
-from gurobipy import Model, GRB, QuadExpr
+from gurobipy import Model, GRB
 from tqdm import tqdm
 
 # === Helper function ====
@@ -23,7 +23,7 @@ def eval(wtp, x, k, setting='fractional'):
         y = model.addVars(n, vtype=GRB.BINARY, name="y")
     
     # Auxiliary variables for potential evaluations
-    z = model.addVars(n, lb=0, name="z")
+    z = model.addVars(m, lb=0, name="z")
     
     # Objective: Maximize the WTP function
     model.setObjective(
