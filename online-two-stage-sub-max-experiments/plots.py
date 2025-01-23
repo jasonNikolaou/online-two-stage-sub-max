@@ -8,7 +8,8 @@ settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representative
 
 # settings = [{'dataset': 'images', 'title': 'Image summarization'}]
 # settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
-settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
+# settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
+
 
 cmap = plt.get_cmap("viridis")  # colorblind palette
 marker_styles = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']  # Unique markers for each line
@@ -38,6 +39,9 @@ for setting in settings:
     balkanskiVal = data[f'balkanski_val']
 
     repGreedyVal = data['repGreedy_val']
+
+    # print(data['int_sol_GA'])
+    # print(data['int_sol'])
 
     # Compute cumulative sum of rewards
     cum_frac_GA = np.cumsum(frac_rewards_GA)
@@ -80,10 +84,10 @@ for setting in settings:
 
     # Prepare data and labels
     lines = [
-        (avg_cum_int_GA, 'RAOCO-GA'),
+        (avg_cum_int_GA, 'RAOCO-OGA'),
         (avg_cum_int_FTRL_l2, 'RAOCO-FTRL-L2'),
         (avg_cum_int_FTRL_entropy, 'RAOCO-FTRL-H'),
-        (avg_cum_int_one_stage_GA, '1S-GA'),
+        (avg_cum_int_one_stage_GA, '1S-OGA'),
         (avg_cum_random, 'Random')
     ]
     fixed_lines = [

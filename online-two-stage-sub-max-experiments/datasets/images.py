@@ -53,27 +53,19 @@ print(f"Sample images for category 'sheep': {cat_img['sheep'][:5]}")
 
 # Create feature vectors
 print("Creating feature vectors...")
-feat_vec = {}
+featvec = {}
 for img, cat_list in images.items():
     vec = np.zeros(len(categories), dtype=int)
     for cat in cat_list:
         vec[categories.index(cat)] += 1
-    feat_vec[img] = vec
+    featvec[img] = vec
 
-# # Example output
-# for cnt, (img, vec) in enumerate(feat_vec.items()):
-#     if cnt < 5:
-#         print(f"{img}: {images[img]}")
-#         print(f"Feature vector: {vec}")
-#         print("")
 
-# # Find exemplar
-# exemplar = max(feat_vec.values(), key=np.linalg.norm)
-# exemplar *= 0  # Reset exemplar based on the condition
 
-# # Compute distances
-# print("Computing distances...")
-# exemp_dist = {img: np.linalg.norm(vec - exemplar) for img, vec in feat_vec.items()}
+dist = dict()
+for el1 in featvec:
+    for el2 in featvec:
+        dist[(el1, el2)] = np.linalg.norm(featvec[el1] - featvec[el2])
 
 dist = {
     (img1, img2): np.linalg.norm(vec1 - vec2)
@@ -84,7 +76,8 @@ dist = {
 sim = dict()
 max_distance = max(dist.values())
 for key, d in dist.items():
-    sim[key] = 1 - (d / max_distance)
+    sim[key] = 1 - d / max_distance
+    # print(sim[key], dist[key])
 
 print("Processing complete.")
 
@@ -126,6 +119,8 @@ for v_prime in images:
     # Create the WTP object
     wtps.append(WTP(potentials=potentials, weights=weights))
 
+m = 10 # number of different functions
+wtps = wtps[:m]
 file = './instances/images.pkl'
 with open(file, 'wb') as file:
     pickle.dump(wtps, file)

@@ -111,7 +111,7 @@ def gradient(wtp, x, k):
 #         )
     
 #     # Cardinality constraint: sum(y) = k
-#     model.addConstr(sum(y[i] for i in range(n)) == k, name="cardinality")
+#     model.addConstr(sum(y[i] for i in range(n)) <= k, name="cardinality")
     
 #     # Element-wise constraint: y[i] <= x[i]
 #     upper_bound_constraints = []
@@ -191,10 +191,12 @@ class GradientAscent:
             Given the sequence of functions fs = f_1, ..., f_{t-1} and the last iterate y = y_{t-1}
             return the next iterate y_t
         '''
+        # self.eta_t = self.eta / np.sqrt(len(fs))
+        self.eta_t = self.eta
         if self.setting == 'one-stage':
-            z = x + self.eta * fs[-1].grad(x)
+            z = x + self.eta_t * fs[-1].grad(x)
         else:
-            z = x + self.eta * gradient(fs[-1], x, self.k)
+            z = x + self.eta_t * gradient(fs[-1], x, self.k)
         
         x = self.proj(z)
         return x
@@ -252,7 +254,9 @@ class FTRL:
             regularizer_term = gp.quicksum(self.z_vars[i] for i in range(self.n))
         
         # Set objective function: linear_term - regularizer_term / (2 * eta)
-        self.model.setObjective(linear_term - 1 / (2 * self.eta) * regularizer_term, gp.GRB.MAXIMIZE)
+        self.eta_t = self.eta
+        # self.eta_t = self.eta / np.sqrt(len(fs))
+        self.model.setObjective(linear_term - 1 / (2 * self.eta_t) * regularizer_term, gp.GRB.MAXIMIZE)
 
         # Warm-start: Set the initial values of decision variables
         for i in range(self.n):
