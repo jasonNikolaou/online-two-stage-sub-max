@@ -7,20 +7,26 @@ import random
 
 random.seed(42)
 
-settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.5}]
-# settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1}]
+settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
+# settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
+settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.01, 'sample': False}]
 algorithms = ['FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT', 'Random']
 
 for setting in settings:
     dataset = setting['dataset']
     print(f'=== Running experiments for dataset = {dataset} ===')
-    # Reading the list back from the file
+
     with open(f'./instances/{dataset}.pkl', 'rb') as file:
         wtps = pickle.load(file)
 
     # Input
-    T = setting['T']
-    fs = random.choices(wtps, k=T)
+    if setting['sample']:
+        T = setting['T']
+        fs = random.choices(wtps, k=T)
+    else:
+        fs = wtps
+        T = len(fs)
+
     n = len(wtps[0].potentials[0].w)
     l = setting['l']
     k = setting['k']
@@ -80,12 +86,13 @@ for setting in settings:
         results['int_sol_FTRL_entropy'] = OL.xs_int[-1]
 
     if 'Random' in algorithms:
-        iterations = 100
+        iterations = 10
         rewards = np.zeros(len(fs))
-        for _ in range(iterations):
+        for t in range(iterations):
             randomAlg = Random(fs, n, l, k)
-            rewards += np.array(randomAlg)
-        
+            vals = randomAlg.solve()
+            rewards += np.array(vals)
+
         rewards /= iterations
         results['random'] = randomAlg.solve()
 
