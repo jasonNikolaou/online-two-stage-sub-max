@@ -116,6 +116,10 @@ for v_prime in images:
     # Normalize weights by 1 / |V|
     weights = [w / n for w in weights]
 
+    # Keep potentials if weight > 0
+    potentials = [potentials[i] for i in range(len(weights)) if weights[i] > 0]
+    weights = [weight for weight in weights if weight > 0]
+
     # Create the WTP object
     wtps.append(WTP(potentials=potentials, weights=weights))
 

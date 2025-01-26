@@ -8,11 +8,12 @@ import random
 random.seed(42)
 np.random.seed(42)
 
-
 settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 1, 'sample': True}]
 settings = [{'dataset': 'images', 'T': 250, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
 settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 10, 'sample': False}]
-settings = [{'dataset': 'movies', 'T': 50, 'l': 10, 'k': 4, 'eta': 10, 'sample': True}]
+# settings = [{'dataset': 'movies', 'T': 50, 'l': 10, 'k': 3, 'eta': 10, 'sample': True}]
+# settings = [{'dataset': 'influence', 'T': 100, 'l': 8, 'k': 3, 'eta': 10, 'sample': True}]
+
 
 # settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.1, 'sample': False}, 
 #             {'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True},
@@ -119,7 +120,7 @@ for setting in settings:
                 results['eta_FTRL_entropy'] = eta
 
     if 'Random' in algorithms:
-        iterations = 1
+        iterations = 10
         print(f'Running random for {iterations} iterations')
         rewards = np.zeros(len(fs))
         for t in range(iterations):
@@ -152,7 +153,7 @@ for setting in settings:
             print(f'Before running balkasnki algorithm, run OPT.')
         else:
             balkanskiVal = 0
-            iterations = 2
+            iterations = 10
             print(f"Running Balkanski's algorithm {iterations} times.")
             for t in range(iterations):
                 balkanski = Balkanski(fracSol, l, k, fs)

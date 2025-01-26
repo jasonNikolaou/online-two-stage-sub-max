@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import random
 import sys
 import os
 
@@ -16,6 +17,19 @@ sigma = 20
 
 m = 50
 inputs = []
+def setH(h, players):
+    for p in players:
+        h[p] = max_val
+    H = np.zeros(n**2).reshape(n, n) # pairwise complementarity
+    for i in range(n-1):
+        for j in range(i+1, n):
+            H[i][j] = min(np.random.normal(-20, 10, 1), 0)
+            H[j][i] = H[i][j]
+    for p in players:
+        H[p] = np.zeros(n)
+        H[: p] = np.zeros(n)
+    return h, H
+
 for j in range(m):
     print(f'Creating function #{j}')
     values = np.random.normal(mu, sigma, n)
@@ -23,15 +37,25 @@ for j in range(m):
     values = np.maximum([min_val] * n, values)
     h = values # value of each player
 
-    h[0] = h[1] = h[2] = h[3] = max_val # 4 players with maximium value
+    random_task = random.randint(1, 5)
+    if random_task == 1:
+        h, H = setH(h, [0, 1, 2, 3])
+    if random_task == 2:
+        h, H = setH(h, [1, 2, 3, 4])
+    if random_task == 3:
+        h, H = setH(h, [10, 11, 12, 13])
+    if random_task == 4:
+        h, H = setH(h, [11, 12, 13, 14])
+    # h[0] = h[1] = h[2] = h[3] = max_val # 4 players with maximium value
 
-    H = np.zeros(n**2).reshape(n, n) # pairwise complementarity
-    for i in range(n-1):
-        for j in range(i+1, n):
-            H[i][j] = min(np.random.normal(-20, 10, 1), 0)
-            H[j][i] = H[i][j]
-    H[0] = H[1] = H[2] = H[3] = np.zeros(n)
-    H[:,0] = H[:,1] = H[:,2] = H[:,3] = np.zeros(n)
+    # H = np.zeros(n**2).reshape(n, n) # pairwise complementarity
+    # for i in range(n-1):
+    #     for j in range(i+1, n):
+    #         H[i][j] = min(np.random.normal(-20, 10, 1), 0)
+    #         H[j][i] = H[i][j]
+    # H[0] = H[1] = H[2] = H[3] = np.zeros(n)
+    # H[:,0] = H[:,1] = H[:,2] = H[:,3] = np.zeros(n)
+    
 
     # shrink rows and cols of H until we achieve submodularity
     ones = np.ones(n)
@@ -69,6 +93,10 @@ for input in inputs:
                 w[i] = w[j] = 1
                 potentials.append(Potential(1, w))
                 weights.append(-H[i][j])
+    
+    # Keep potentials if weight > 0
+    potentials = [potentials[i] for i in range(len(weights)) if weights[i] > 0]
+    weights = [weight for weight in weights if weight > 0]
 
     wtps.append(WTP(potentials, weights))
     
