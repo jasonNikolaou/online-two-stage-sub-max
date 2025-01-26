@@ -14,7 +14,7 @@ min_val = 0
 mu = 60
 sigma = 20
 
-m = 100
+m = 50
 inputs = []
 for j in range(m):
     print(f'Creating function #{j}')
@@ -84,6 +84,6 @@ print(wtps[5].eval(x_1))
 
 x_2 = np.zeros(n) # suboptimal team
 x_2[[-1, -2, -3, -4]] = 1
-print(wtps[91].eval(x_2))
+print(wtps[40].eval(x_2))
 
 print(f'# of potentials = {len(wtps[0].potentials)}')

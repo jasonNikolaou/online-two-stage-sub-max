@@ -81,6 +81,7 @@ class OnlineLearning:
         self.int_rewards = []
         x = self.x0
         for t in tqdm(range(self.T)):
+        # for t in range(self.T):
             self.frac_rewards.append(eval(self.fs[t], x, self.k, 'fractional'))
             self.xs.append(x)
 

@@ -61,7 +61,6 @@ for img, cat_list in images.items():
     featvec[img] = vec
 
 
-
 dist = dict()
 for el1 in featvec:
     for el2 in featvec:
@@ -69,14 +68,15 @@ for el1 in featvec:
 
 dist = {
     (img1, img2): np.linalg.norm(vec1 - vec2)
-    for img1, vec1 in feat_vec.items()
-    for img2, vec2 in feat_vec.items()
+    for img1, vec1 in featvec.items()
+    for img2, vec2 in featvec.items()
 }
 
 sim = dict()
 max_distance = max(dist.values())
 for key, d in dist.items():
-    sim[key] = 1 - d / max_distance
+    sim[key] = (1 - d / max_distance) * 100
+    # sim[key] = np.exp(-0.1 * d)
     # print(sim[key], dist[key])
 
 print("Processing complete.")
