@@ -8,8 +8,9 @@ settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representative
 
 # settings = [{'dataset': 'images', 'title': 'Image summarization'}]
 settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
-# settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
-settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
+settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
+# settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
+# settings = [{'dataset': 'influence', 'title': 'Influence maximization'}]
 
 
 
