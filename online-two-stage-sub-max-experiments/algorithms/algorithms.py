@@ -81,7 +81,7 @@ def gradient(wtp, x, k):
     else:
         raise ValueError("Optimization failed. Status: " + str(model.status))
 
-# def gradient(wtp, x, k, epsilon=1e-3):
+# def gradient(wtp, x, k, epsilon=1e-6):
 #     m = len(wtp.potentials)  # Number of potentials
 #     n = len(x)  # Dimensions
 
@@ -166,8 +166,6 @@ def gradient(wtp, x, k):
 #             grad[i] = 0
     
 #     return grad
-
-
 
 # =============================
 

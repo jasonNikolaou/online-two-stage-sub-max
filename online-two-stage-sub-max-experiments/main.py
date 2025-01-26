@@ -8,14 +8,18 @@ import random
 random.seed(42)
 np.random.seed(42)
 
-# settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 1, 'sample': True}]
-settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
-# settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.01, 'sample': False}]
+
+settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 1, 'sample': True}]
+settings = [{'dataset': 'images', 'T': 250, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
+settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 10, 'sample': False}]
+settings = [{'dataset': 'movies', 'T': 50, 'l': 10, 'k': 4, 'eta': 10, 'sample': True}]
+
 # settings = [{'dataset': 'teamformation', 'l': 10, 'k': 4, 'eta': 0.1, 'sample': False}, 
 #             {'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True},
 #             {'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
 algorithms = ['FTRL-l2', 'FTRL-entropy', 'GA', 'one-stage GA', 'balkanski', 'repGreedy', 'OPT', 'Random']
 
+etas = [0.0001, 0.001, 0.01, 0.1, 1, 10]
 
 for setting in settings:
     dataset = setting['dataset']
@@ -46,50 +50,73 @@ for setting in settings:
     if 'GA' in algorithms:
         print(f'Running Gradient Ascent')
         pipage = Pipage()
-        ga = GradientAscent(l=l, k=k, n=n, eta=eta)
-        OL = OnlineLearning(fs, x0, k, ga, pipage)
-        OL.run()
+        rewards = []
+        for eta in etas:
+            print(f'eta = {eta}')
+            ga = GradientAscent(l=l, k=k, n=n, eta=eta)
+            OL = OnlineLearning(fs, x0, k, ga, pipage)
+            OL.run()
 
-        results['frac_rewards_GA'] = OL.frac_rewards
-        results['int_rewards_GA'] = OL.int_rewards
-        results['frac_sol_GA'] = OL.xs[-1]
-        results['int_sol_GA'] = OL.xs_int[-1]
+            if sum(OL.int_rewards) > sum(rewards):
+                rewards = OL.int_rewards
+                results['frac_rewards_GA'] = OL.frac_rewards
+                results['int_rewards_GA'] = OL.int_rewards
+                results['frac_sol_GA'] = OL.xs[-1]
+                results['int_sol_GA'] = OL.xs_int[-1]
+                results['eta_GA'] = eta
 
     if 'one-stage GA' in algorithms:
         print(f'Running one-stage Gradient Ascent')
         pipage = Pipage()
-        ga = GradientAscent(l=l, k=k, n=n, eta=eta, setting='one-stage')
-        OL = OnlineLearning(fs, x0, k, ga, pipage)
-        OL.run()
-
-        results['one_stage_frac_rewards_GA'] = OL.frac_rewards
-        results['one_stage_int_rewards_GA'] = OL.int_rewards
-        results['frac_sol_one_stage_GA'] = OL.xs[-1]
-        results['int_sol_one_stage_GA'] = OL.xs_int[-1]
+        rewards = []
+        for eta in etas:
+            print(f'eta = {eta}')
+            ga = GradientAscent(l=l, k=k, n=n, eta=eta, setting='one-stage')
+            OL = OnlineLearning(fs, x0, k, ga, pipage)
+            OL.run()
+            if sum(OL.int_rewards) > sum(rewards):
+                rewards = OL.int_rewards
+                results['one_stage_frac_rewards_GA'] = OL.frac_rewards
+                results['one_stage_int_rewards_GA'] = OL.int_rewards
+                results['frac_sol_one_stage_GA'] = OL.xs[-1]
+                results['int_sol_one_stage_GA'] = OL.xs_int[-1]
+                results['eta_one_stage_GA'] = eta
 
     if 'FTRL-l2' in algorithms:
         print(f'Running FTRL with L2 regularizer')
         pipage = Pipage()
-        ftrl = FTRL(l=l, k=k, n=n, eta=eta, regularizer='l2', setting='two-stage')
-        OL = OnlineLearning(fs, x0, k, ftrl, pipage)
-        OL.run()
-
-        results['frac_rewards_FTRL_l2'] = OL.frac_rewards
-        results['int_rewards_FTRL_l2'] = OL.int_rewards
-        results['frac_sol_FTRL_l2'] = OL.xs[-1]
-        results['int_sol_FTRL_l2'] = OL.xs_int[-1]
+        rewards = []
+        for eta in etas:
+            print(f'eta = {eta}')
+            ftrl = FTRL(l=l, k=k, n=n, eta=eta, regularizer='l2', setting='two-stage')
+            OL = OnlineLearning(fs, x0, k, ftrl, pipage)
+            OL.run()
+            
+            if sum(OL.int_rewards) > sum(rewards):
+                rewards = OL.int_rewards
+                results['frac_rewards_FTRL_l2'] = OL.frac_rewards
+                results['int_rewards_FTRL_l2'] = OL.int_rewards
+                results['frac_sol_FTRL_l2'] = OL.xs[-1]
+                results['int_sol_FTRL_l2'] = OL.xs_int[-1]
+                results['eta_FTRL_l2'] = eta
 
     if 'FTRL-entropy' in algorithms:
         print(f'Running FTRL with Entropic regularizer')
         pipage = Pipage()
-        ftrl = FTRL(l=l, k=k, n=n, eta=eta, regularizer='entropy', setting='two-stage')
-        OL = OnlineLearning(fs, x0, k, ftrl, pipage)
-        OL.run()
+        rewards = []
+        for eta in etas:
+            print(f'eta = {eta}')
+            ftrl = FTRL(l=l, k=k, n=n, eta=eta, regularizer='entropy', setting='two-stage')
+            OL = OnlineLearning(fs, x0, k, ftrl, pipage)
+            OL.run()
 
-        results['frac_rewards_FTRL_entropy'] = OL.frac_rewards
-        results['int_rewards_FTRL_entropy'] = OL.int_rewards
-        results['frac_sol_FTRL_entropy'] = OL.xs[-1]
-        results['int_sol_FTRL_entropy'] = OL.xs_int[-1]
+            if sum(OL.int_rewards) > sum(rewards):
+                rewards = OL.int_rewards
+                results['frac_rewards_FTRL_entropy'] = OL.frac_rewards
+                results['int_rewards_FTRL_entropy'] = OL.int_rewards
+                results['frac_sol_FTRL_entropy'] = OL.xs[-1]
+                results['int_sol_FTRL_entropy'] = OL.xs_int[-1]
+                results['eta_FTRL_entropy'] = eta
 
     if 'Random' in algorithms:
         iterations = 1

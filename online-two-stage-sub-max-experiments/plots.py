@@ -7,8 +7,10 @@ settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representative
             {'dataset': 'teamformation', 'title': 'Team formation'}]
 
 # settings = [{'dataset': 'images', 'title': 'Image summarization'}]
-# settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
+settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
 # settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
+settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
+
 
 
 cmap = plt.get_cmap("viridis")  # colorblind palette
@@ -31,6 +33,12 @@ for setting in settings:
     frac_rewards_one_stage_GA = data['one_stage_frac_rewards_GA']
     int_rewards_one_stage_GA = data['one_stage_int_rewards_GA']
 
+    eta_GA = data['eta_GA']
+    eta_one_stage_GA = data['eta_one_stage_GA']
+    eta_FTRL_l2 = data['eta_FTRL_l2']
+    eta_FTRL_entropy = data['eta_FTRL_entropy']
+    print(f'eta GA, 1SGA, FTRL-l2, FTRL-H = {eta_GA, eta_one_stage_GA, eta_FTRL_l2, eta_FTRL_entropy}')
+    print
     rewards_random = data['random']
 
     frac_opt = data['frac_opt']
@@ -85,15 +93,15 @@ for setting in settings:
     # Prepare data and labels
     lines = [
         (avg_cum_int_GA, 'RAOCO-OGA'),
-        (avg_cum_int_FTRL_l2, 'RAOCO-FTRL-L2'),
+        (avg_cum_int_FTRL_l2, 'RAOCO-FTRL-$L_2$'),
         (avg_cum_int_FTRL_entropy, 'RAOCO-FTRL-H'),
         (avg_cum_int_one_stage_GA, '1S-OGA'),
         (avg_cum_random, 'Random')
     ]
     fixed_lines = [
-        ([int_opt / T] * T, '--', 'OPT'),
-        ([balkanskiVal / T] * T, '-.', 'CNT-OPT'),
-        ([repGreedyVal / T] * T, '-.', 'REP-GRD'),
+        ([int_opt / T] * T, '--', 'OFLN - OPT'),
+        ([balkanskiVal / T] * T, '-.', 'OFLN - CO'),
+        ([repGreedyVal / T] * T, '-.', 'OFLN - RGR'),
     ]
 
     num_lines = len(lines) + len(fixed_lines)
@@ -122,8 +130,8 @@ for setting in settings:
         )
 
     # plt.title(title)
-    plt.xlabel("Time Steps")
-    plt.ylabel("Rewards")
+    plt.xlabel("Time Steps", fontsize=16)
+    plt.ylabel("$C_t$", fontsize=16)
     plt.legend()
     plt.grid(True)
 
