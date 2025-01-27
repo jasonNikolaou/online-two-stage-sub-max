@@ -4,13 +4,14 @@ import pickle
 
 settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'},
             {'dataset': 'images', 'title': 'Image summarization'},
-            {'dataset': 'teamformation', 'title': 'Team formation'}]
+            {'dataset': 'teamformation', 'title': 'Team formation'},
+            {'dataset': 'influence', 'title': 'Influence maximization'}]
 
 # settings = [{'dataset': 'images', 'title': 'Image summarization'}]
 settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
 settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
-# settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
-# settings = [{'dataset': 'influence', 'title': 'Influence maximization'}]
+settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
+settings = [{'dataset': 'influence', 'title': 'Influence maximization'}]
 
 
 
