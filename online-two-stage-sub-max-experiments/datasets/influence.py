@@ -69,7 +69,7 @@ def sample_edges_and_components(G, p):
     
     return node_to_component, components
 
-p = 0.1 # Sampling probability
+p = 0.25 # Sampling probability
 print(f'sampling probability = {p}')
 node_to_component, components = sample_edges_and_components(G, p)
 
