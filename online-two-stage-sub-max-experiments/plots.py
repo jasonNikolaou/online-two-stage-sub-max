@@ -8,10 +8,11 @@ settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representative
             {'dataset': 'influence', 'title': 'Influence maximization'}]
 
 # settings = [{'dataset': 'images', 'title': 'Image summarization'}]
-settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
+# settings = [{'dataset': 'wikipedia', 'title': 'Wikipedia articles representatives'}]
 settings = [{'dataset': 'teamformation', 'title': 'Team formation'}]
-settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
-settings = [{'dataset': 'influence', 'title': 'Influence maximization'}]
+# settings = [{'dataset': 'movies', 'title': 'Movie recommendation'}]
+# settings = [{'dataset': 'influence', 'title': 'Influence maximization'}]
+settings = [{'dataset': 'coverage', 'title': 'Coverage'}]
 
 
 
@@ -25,62 +26,78 @@ for setting in settings:
         data = pickle.load(file)
 
     # Retrieve the rewards array from the dictionary
-    frac_rewards_GA = data["frac_rewards_GA"]
-    int_rewards_GA = data["int_rewards_GA"]
-    frac_rewards_FTRL_l2 = data["frac_rewards_FTRL_l2"]
-    int_rewards_FTRL_l2 = data["int_rewards_FTRL_l2"]
-    frac_rewards_FTRL_entropy = data["frac_rewards_FTRL_entropy"]
-    int_rewards_FTRL_entropy = data["int_rewards_FTRL_entropy"]
+    if 'frac_rewards_GA' in data:
+        frac_rewards_GA = data["frac_rewards_GA"]
+        int_rewards_GA = data["int_rewards_GA"]
+        eta_GA = data['eta_GA']
+        print(f'eta GA = {eta_GA}')
+        print(f"GA sol = {np.round(data['frac_sol_GA'], 1)}")
+        T = len(frac_rewards_GA)
+    if 'frac_rewards_FTRL_l2' in data:
+        frac_rewards_FTRL_l2 = data["frac_rewards_FTRL_l2"]
+        int_rewards_FTRL_l2 = data["int_rewards_FTRL_l2"]
+        eta_FTRL_l2 = data['eta_FTRL_l2']
+        print(f'eta FTRL l2 = {eta_FTRL_l2}')
+        T = len(frac_rewards_FTRL_l2)
+    if 'frac_rewards_FTRL_entropy' in data:   
+        frac_rewards_FTRL_entropy = data["frac_rewards_FTRL_entropy"]
+        int_rewards_FTRL_entropy = data["int_rewards_FTRL_entropy"]
+        eta_FTRL_entropy = data['eta_FTRL_entropy']
+        print(f'eta FTRL entropy = {eta_FTRL_entropy}')
+        T = len(frac_rewards_FTRL_entropy)
+    if 'one_stage_frac_rewards_GA' in data:
+        frac_rewards_one_stage_GA = data['one_stage_frac_rewards_GA']
+        int_rewards_one_stage_GA = data['one_stage_int_rewards_GA']
+        eta_one_stage_GA = data['eta_one_stage_GA']
+        print(f"one stage GA sol = {np.round(data['frac_sol_one_stage_GA'], 1)}")
 
-    frac_rewards_one_stage_GA = data['one_stage_frac_rewards_GA']
-    int_rewards_one_stage_GA = data['one_stage_int_rewards_GA']
+        print(f'eta one-stage GA = {eta_one_stage_GA}')
 
-    eta_GA = data['eta_GA']
-    eta_one_stage_GA = data['eta_one_stage_GA']
-    eta_FTRL_l2 = data['eta_FTRL_l2']
-    eta_FTRL_entropy = data['eta_FTRL_entropy']
-    print(f'eta GA, 1SGA, FTRL-l2, FTRL-H = {eta_GA, eta_one_stage_GA, eta_FTRL_l2, eta_FTRL_entropy}')
-    print
-    rewards_random = data['random']
+    if 'random' in data:
+        rewards_random = data['random']
 
-    frac_opt = data['frac_opt']
-    int_opt = data['int_opt']
+    if 'frac_opt' in data:
+        frac_opt = data['frac_opt']
+        int_opt = data['int_opt']
+        print(f"int_sol = {data['int_sol']}")
 
-    balkanskiVal = data[f'balkanski_val']
+    if 'balkanski_val' in data:
+        balkanskiVal = data[f'balkanski_val']
 
-    repGreedyVal = data['repGreedy_val']
+    if 'repGreedy_val' in data:
+        repGreedyVal = data['repGreedy_val']
 
     # print(data['int_sol_GA'])
     # print(data['int_sol'])
 
-    # Compute cumulative sum of rewards
-    cum_frac_GA = np.cumsum(frac_rewards_GA)
-    cum_int_GA = np.cumsum(int_rewards_GA)
-    cum_frac_FTRL_l2 = np.cumsum(frac_rewards_FTRL_l2)
-    cum_int_FTRL_l2 = np.cumsum(int_rewards_FTRL_l2)
-    cum_frac_FTRL_entropy = np.cumsum(frac_rewards_FTRL_entropy)
-    cum_int_FTRL_entropy = np.cumsum(int_rewards_FTRL_entropy)
-
-    cum_frac_one_stage_GA = np.cumsum(frac_rewards_one_stage_GA)
-    cum_int_one_stage_GA = np.cumsum(int_rewards_one_stage_GA)
-
-    cum_random = np.cumsum(rewards_random)
-
-    T = len(cum_frac_GA)
+    
     timesteps = np.arange(1, T+1)
-    # Compute the average cumulative rewards at each time step
-    avg_cum_frac_GA = cum_frac_GA / timesteps
-    avg_cum_int_GA = cum_int_GA / timesteps
 
-    avg_cum_frac_FTRL_l2 = cum_frac_FTRL_l2/ timesteps
-    avg_cum_int_FTRL_l2 = cum_int_FTRL_l2 / timesteps
-    avg_cum_frac_FTRL_entropy = cum_frac_FTRL_entropy/ timesteps
-    avg_cum_int_FTRL_entropy = cum_int_FTRL_entropy / timesteps
+    # Compute cumulative sum of rewards and running average
+    if 'frac_rewards_GA' in data:
+        cum_frac_GA = np.cumsum(frac_rewards_GA)
+        cum_int_GA = np.cumsum(int_rewards_GA)
+        avg_cum_frac_GA = cum_frac_GA / timesteps
+        avg_cum_int_GA = cum_int_GA / timesteps
+    if 'frac_rewards_FTRL_l2' in data:
+        cum_frac_FTRL_l2 = np.cumsum(frac_rewards_FTRL_l2)
+        cum_int_FTRL_l2 = np.cumsum(int_rewards_FTRL_l2)
+        avg_cum_frac_FTRL_l2 = cum_frac_FTRL_l2 / timesteps
+        avg_cum_int_FTRL_l2 = cum_int_FTRL_l2 / timesteps
+    if 'frac_rewards_FTRL_entropy' in data:
+        cum_frac_FTRL_entropy = np.cumsum(frac_rewards_FTRL_entropy)
+        cum_int_FTRL_entropy = np.cumsum(int_rewards_FTRL_entropy)
+        avg_cum_frac_FTRL_entropy = cum_frac_FTRL_entropy / timesteps
+        avg_cum_int_FTRL_entropy = cum_int_FTRL_entropy / timesteps
+    if 'one_stage_frac_rewards_GA' in data:
+        cum_frac_one_stage_GA = np.cumsum(frac_rewards_one_stage_GA)
+        cum_int_one_stage_GA = np.cumsum(int_rewards_one_stage_GA)
+        avg_cum_frac_one_stage_GA = cum_frac_one_stage_GA / timesteps
+        avg_cum_int_one_stage_GA = cum_int_one_stage_GA / timesteps
+    if 'random' in data:
+        cum_random = np.cumsum(rewards_random)
+        avg_cum_random = cum_random / timesteps
 
-    avg_cum_frac_one_stage_GA = cum_frac_one_stage_GA/ timesteps
-    avg_cum_int_one_stage_GA = cum_int_one_stage_GA/ timesteps
-
-    avg_cum_random = cum_random / timesteps
 
     # Plot the rewards
     # plt.plot(avg_cum_int_GA, label='GA')
@@ -93,18 +110,40 @@ for setting in settings:
 
 
     # Prepare data and labels
-    lines = [
-        (avg_cum_int_GA, 'RAOCO-OGA'),
-        (avg_cum_int_FTRL_l2, 'RAOCO-FTRL-$L_2$'),
-        (avg_cum_int_FTRL_entropy, 'RAOCO-FTRL-H'),
-        (avg_cum_int_one_stage_GA, '1S-OGA'),
-        (avg_cum_random, 'Random')
-    ]
-    fixed_lines = [
-        ([int_opt / T] * T, '--', 'OFLN - OPT'),
-        ([balkanskiVal / T] * T, '-.', 'OFLN - CO'),
-        ([repGreedyVal / T] * T, '-.', 'OFLN - RGR'),
-    ]
+    lines = []
+    if 'frac_rewards_GA' in data:
+        lines.append((avg_cum_int_GA, 'RAOCO-OGA'))
+    if 'frac_rewards_FTRL_l2' in data:
+        lines.append((avg_cum_int_FTRL_l2, 'RAOCO-FTRL-$L_2$'))
+    if 'frac_rewards_FTRL_entropy' in data:
+        lines.append((avg_cum_int_FTRL_entropy, 'RAOCO-FTRL-H'))
+    if 'one_stage_frac_rewards_GA' in data:
+        lines.append((avg_cum_int_one_stage_GA, '1S-OGA'))
+    if 'random' in data:
+        lines.append((avg_cum_random, 'Random'))
+
+    # lines = [
+    #     (avg_cum_int_GA, 'RAOCO-OGA'),
+    #     (avg_cum_int_FTRL_l2, 'RAOCO-FTRL-$L_2$'),
+    #     (avg_cum_int_FTRL_entropy, 'RAOCO-FTRL-H'),
+    #     (avg_cum_int_one_stage_GA, '1S-OGA'),
+    #     (avg_cum_random, 'Random')
+    # ]
+    fixed_lines = []
+    if 'frac_opt' in data:
+        fixed_lines.append(([int_opt / T] * T, '--', 'OFLN - OPT'))
+
+    if 'balkanski_val' in data:
+        fixed_lines.append(([balkanskiVal / T] * T, '-.', 'OFLN - CO'),)
+
+    if 'repGreedy_val' in data:
+        fixed_lines.append(([repGreedyVal / T] * T, '-.', 'OFLN - RGR'))
+
+    # fixed_lines = [
+    #     ([int_opt / T] * T, '--', 'OFLN - OPT'),
+    #     ([balkanskiVal / T] * T, '-.', 'OFLN - CO'),
+    #     ([repGreedyVal / T] * T, '-.', 'OFLN - RGR'),
+    # ]
 
     num_lines = len(lines) + len(fixed_lines)
     colors = [cmap(i / (num_lines - 1)) for i in range(num_lines)]

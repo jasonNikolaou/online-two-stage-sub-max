@@ -60,7 +60,7 @@ def gradient(wtp, x, k):
             name=f"z_{i}_dot"
         )
     
-    # Cardinality constraint: sum(x) = k
+    # Cardinality constraint: sum(y) = k
     model.addConstr(sum(y[i] for i in range(n)) == k, name="cardinality")
     
     # Element-wise constraint: y[i] <= x[i]
@@ -95,8 +95,8 @@ class GradientAscent:
     def proj(self, z):
         return project(z, self.n, self.l)
 
-    def grad(self, f, x):
-        return gradient(f, x)
+    # def grad(self, f, x):
+    #     return gradient(f, x)
 
     def next(self, fs, x):
         ''' 
@@ -105,11 +105,13 @@ class GradientAscent:
         '''
         # self.eta_t = self.eta / np.sqrt(len(fs))
         self.eta_t = self.eta
-        if self.setting == 'one-stage':
-            z = x + self.eta_t * fs[-1].grad(x)
-        else:
-            z = x + self.eta_t * gradient(fs[-1], x, self.k)
         
+        if self.setting == 'one-stage':
+            grad = fs[-1].grad(x)
+        else:
+            grad = gradient(fs[-1], x, self.k)
+
+        z = x + self.eta_t * grad
         x = self.proj(z)
         return x
 
