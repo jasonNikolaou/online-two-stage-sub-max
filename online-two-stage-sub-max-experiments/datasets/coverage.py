@@ -9,34 +9,35 @@ from WTP import Potential, WTP
 
 np.random.seed(seed = 42)
 n = 100
-l = 10
+l = 20
 k = 1
 
-wtps = []
-for i in range(0, 3*l, 3):
-    potentials = []
-    weights = []
+M = 100
+m = M
 
-    # set i covers element i
-    w_1 = np.zeros(n)
-    w_1[i] = 1
-    potential_1 = Potential(1, w_1)
-
-    # set i+1 covers element i+1
-    w_2 = np.zeros(n)
-    w_2[i+1] = 1
-    potential_2 = Potential(1, w_2)
-
-    # set i+2 covers elements i, i+1, i+2
-    w_3 = np.zeros(n)
-    w_3[i] = w_3[i+1] = w_3[i+2] = 1
-    potential_3 = Potential(1, w_3)
-
-    potentials = [potential_1, potential_2, potential_3]
-    weights = [1, 1, 1]
-
-    wtps.append(WTP(potentials, weights))
+# l sets. each set covers a single element with value M
+potentials_high_value = []
+for i in range(l):
+    w_0 = np.zeros(n)
+    w_0[i] = 1
+    potentials_high_value.append(Potential(1, w_0))
     
+wtp1 = WTP(potentials_high_value, [M] * l)
+
+
+# l sets. each set covers one element with value m
+wtps_low_value = []
+for i in range(l):
+    w_2= np.zeros(n)
+    w_2[l + i] = 1
+    potential_2 = Potential(1, w_2)
+    wtp2 = WTP([potential_2], [m])
+    wtps_low_value.append(wtp2)
+
+wtps = [wtp1] + wtps_low_value
+
+wtps = wtps * 20
+
 file = './instances/coverage.pkl'
 with open(file, 'wb') as file:
     pickle.dump(wtps, file)

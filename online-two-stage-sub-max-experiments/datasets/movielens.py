@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from WTP import Potential, WTP
 
-n = 2000 # movies
+n = 1000 # movies
 m = 100
 nr = 20
 

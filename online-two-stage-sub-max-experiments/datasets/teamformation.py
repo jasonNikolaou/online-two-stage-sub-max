@@ -37,7 +37,7 @@ for j in range(m):
     values = np.maximum([min_val] * n, values)
     h = values # value of each player
 
-    random_task = random.choices([1, 2, 3, 4, 5], weights=[0.4, 0.6], k=1)[0]
+    random_task = random.choices([1, 2], weights=[0.4, 0.6], k=1)[0]
     if random_task == 1:
         h, H = setH(h, list(range(10)))
     if random_task == 2:
