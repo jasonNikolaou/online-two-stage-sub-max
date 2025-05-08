@@ -1,6 +1,15 @@
 # online-two-stage-sub-max
 Code for the paper "Online Two-Stage Submodular Maximization"
 
+## 🧩 Problem: Online Two-Stage Submodular Maximization (O2SSM)
+
+Given a collection of monotone submodular functions, the goal of *Two-Stage Submodular Maximization (2SSM)* (Balkanski et al.(2016))is to restrict the ground set so an objective selected u.a.r. from the collection has a high maximal value, on average. 
+We introduce the *Online Two-Stage Submodular Maximization (O2SSM)* problem, in which the submodular objectives are revealed in an online fashion. 
+We study this problem for *Weighted Threshold Potential* functions, a large and important subclass of monotone submodular functions that includes influence maximization, data summarization, and facility location, to name a few.
+We design an algorithm that achieves sublinear $(1 - 1/e)^2$-regret under general matroid constraints and $(1 - 1/e)(1-e^{-k}k^k/k!)$-regret in the case of uniform matroids of rank $k$; the latter also yields a state-of-the-art bound for the (offline) (2SSM)  problem. 
+We empirically validate the performance of our online algorithm with experiments on real datasets.
+
+---
 
 ## 📁 Repository Structure
 
