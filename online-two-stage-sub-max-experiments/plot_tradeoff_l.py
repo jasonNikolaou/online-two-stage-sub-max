@@ -29,7 +29,7 @@ for setting in settings:
     dataset = setting['dataset']
     title = setting['title']
 
-    with open(f'./results/{dataset}_tradeoff_multi.pkl', 'rb') as file:
+    with open(f'./results/{dataset}_tradeoff_l.pkl', 'rb') as file:
         data = pickle.load(file)
 
     T = len(data[1]['GA_int_rewards'][0])
