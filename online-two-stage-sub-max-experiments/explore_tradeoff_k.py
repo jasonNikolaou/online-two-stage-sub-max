@@ -21,10 +21,9 @@ settings = [
 # settings = [{'dataset': 'wikipedia', 'T': 100, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
 # settings = [{'dataset': 'images', 'T': 200, 'l': 20, 'k': 5, 'eta': 0.1, 'sample': True}]
 # settings = [{'dataset': 'movies', 'T': 50, 'l': 10, 'k': 3, 'eta': 10, 'sample': True}]
-settings = [{'dataset': 'coverage', 'T': 100, 'l': 20, 'k': 1, 'eta': 0.1, 'sample': False}]
 
 algorithms = ['GA', 'one-stage GA', 'OPT']
-etas = [0.001, 0.01, 0.1, 1, 10]
+etas = [0.001, 0.01, 0.1, 1]
 runs = 5
 
 for setting in settings:
@@ -35,8 +34,8 @@ for setting in settings:
         wtps = pickle.load(file)
 
     n = len(wtps[0].potentials[0].w)
-    k = setting['k']
-    ls = range(k, 5*k, k)
+    l = setting['l']
+    ks = range(1, l+1) if l <= 10 else range(1, l+1, 2)
 
     results = defaultdict(lambda: defaultdict(list))
 
@@ -51,12 +50,13 @@ for setting in settings:
             fs = wtps
             T = len(fs)
 
-        for l in ls:
-            # Initial x0 used across all k values in this run
-            x0 = np.zeros(n, dtype=int)
-            x0[:l] = 1
-            np.random.shuffle(x0)
-            print(f'--- l = {l} ---')
+        # Initial x0 used across all k values in this run
+        x0 = np.zeros(n, dtype=int)
+        x0[:l] = 1
+        np.random.shuffle(x0)
+
+        for k in ks:
+            print(f'--- k = {k} ---')
 
             if 'GA' in algorithms:
                 pipage = Pipage()
@@ -67,11 +67,11 @@ for setting in settings:
                     OL.run()
                     if sum(OL.int_rewards) > sum(best_rewards):
                         best_rewards = OL.int_rewards
-                        results[l]['GA_int_rewards'].append(OL.int_rewards)
-                        results[l]['GA_frac_rewards'].append(OL.frac_rewards)
-                        results[l]['GA_frac_sol'].append(OL.xs[-1])
-                        results[l]['GA_int_sol'].append(OL.xs_int[-1])
-                        results[l]['GA_eta'].append(eta)
+                        results[k]['GA_int_rewards'].append(OL.int_rewards)
+                        results[k]['GA_frac_rewards'].append(OL.frac_rewards)
+                        results[k]['GA_frac_sol'].append(OL.xs[-1])
+                        results[k]['GA_int_sol'].append(OL.xs_int[-1])
+                        results[k]['GA_eta'].append(eta)
 
             if 'one-stage GA' in algorithms:
                 pipage = Pipage()
@@ -82,11 +82,11 @@ for setting in settings:
                     OL.run()
                     if sum(OL.int_rewards) > sum(best_rewards):
                         best_rewards = OL.int_rewards
-                        results[l]['one_stage_GA_int_rewards'].append(OL.int_rewards)
-                        results[l]['one_stage_GA_frac_rewards'].append(OL.frac_rewards)
-                        results[l]['one_stage_GA_frac_sol'].append(OL.xs[-1])
-                        results[l]['one_stage_GA_int_sol'].append(OL.xs_int[-1])
-                        results[l]['one_stage_GA_eta'].append(eta)
+                        results[k]['one_stage_GA_int_rewards'].append(OL.int_rewards)
+                        results[k]['one_stage_GA_frac_rewards'].append(OL.frac_rewards)
+                        results[k]['one_stage_GA_frac_sol'].append(OL.xs[-1])
+                        results[k]['one_stage_GA_int_sol'].append(OL.xs_int[-1])
+                        results[k]['one_stage_GA_eta'].append(eta)
 
             if 'OPT' in algorithms:
                 print(f'Computing OPT for run {run + 1}')
@@ -94,14 +94,15 @@ for setting in settings:
                 IntOpt = OptimalInHindsight(fs, l, k, 'integral')
                 fracSol, fracVal = FracOpt.solve()
                 intSol, intVal = IntOpt.solve()
-                results[l]['OPT_frac_val'].append(fracVal / T)
-                results[l]['OPT_int_val'].append(intVal / T)
-                results[l]['OPT_frac_sol'].append(fracSol)
-                results[l]['OPT_int_sol'].append(intSol)
+                results[k]['OPT_frac_val'].append(fracVal / T)
+                results[k]['OPT_int_val'].append(intVal / T)
+                results[k]['OPT_frac_sol'].append(fracSol)
+                results[k]['OPT_int_sol'].append(intSol)
 
         # Save run results
-        with open(f'./results/{dataset}_{run}_tradeoff_l.pkl', 'wb') as file:
+        with open(f'./results/{dataset}_{run}_tradeoff_k.pkl', 'wb') as file:
             pickle.dump(dict(results), file)
+            
     # Save full results
-    with open(f'./results/{dataset}_tradeoff_l.pkl', 'wb') as file:
+    with open(f'./results/{dataset}_tradeoff_k.pkl', 'wb') as file:
         pickle.dump(dict(results), file)
